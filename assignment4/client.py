@@ -9,7 +9,8 @@ myname = raw_input('What is your name? ')
 class Client(Handler):
     
     def on_close(self):
-        pass
+        print "** Disconnected from server **"
+        sys.exit(0)
     
     def on_msg(self, msg):
         print msg
@@ -30,3 +31,7 @@ thread.start()
 while 1:
     mytxt = sys.stdin.readline().rstrip()
     client.do_send({'speak': myname, 'txt': mytxt})
+    if mytxt == 'quit':
+        client.do_close()
+        break
+
