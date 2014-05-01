@@ -72,23 +72,34 @@ class View():
         pellets = [pygame.Rect(p[0], p[1], p[2], p[3]) for p in self.m.pellets]
         b = self.m.mybox
         myrect = pygame.Rect(b[0], b[1], b[2], b[3])
-        fps = pygame.time.get_ticks()
-        if fps%50 == 0:
-            print "Position: " , b[0], " ,", b[1]
         screen.fill((0, 0, 64))  # dark blue
         pygame.draw.rect(screen, (0, 191, 255), myrect)  # Deep Sky Blue
         [pygame.draw.rect(screen, (255, 192, 203), p) for p in pellets]  # pink
         [pygame.draw.rect(screen, (0, 191, 255), b) for b in borders]  # red
         pygame.display.update()
+        
+class View2():
+    def __init__(self, m):
+        self.counter = 0
+        self.m = m
+        pygame.init()
+        self.screen = pygame.display.set_mode((400, 300))
+        
+    def display(self):
+        self.counter+=1;
+        b = self.m.mybox
+        if self.counter%50 == 0:
+            print "Position: " , b[0], " ,", b[1]
+
     
 ################### LOOP #############################
 
 model = common.Model()
 c = Controller(model)
-v = View(model)
-
+v = View2(model)
 while not model.game_over:
     sleep(0.02)
     c.poll()
     model.update()
     v.display()
+
