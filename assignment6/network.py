@@ -1,55 +1,10 @@
-"""
-Simple JSON wrapper on top of asyncore TCP sockets. 
-Provides on_open, on_close, on_msg, do_send, and do_close callbacks.
 
-Public domain
-
-With inspiration from:
-http://pymotw.com/2/asynchat/
-http://code.google.com/p/podsixnet/
-http://docstore.mik.ua/orelly/other/python/0596001886_pythonian-chp-19-sect-3.html
-
-
-#################
-# Echo server:
-#################
-from network import Listener, Handler, poll
-
-class MyHandler(Handler):
-    def on_msg(self, data):
-        self.do_send(data)
-
-server = Listener(8888, MyHandler)
-while 1:
-    poll()
-
-
-#################
-# One-message client:
-#################
-from network import Handler, poll
-
-done = False
-
-class Client(Handler):
-    def on_open(self):
-        self.do_send({'a': [1,2], 5: 'hi'})
-        global done
-        done = True
-
-client = Client('localhost', 8888)
-while not done:
-    poll()
-client.do_close()
-
-"""
 
 import asynchat
 import asyncore
 import json
 import os
 import socket
-
 
 class Handler(asynchat.async_chat):
     
@@ -67,7 +22,7 @@ class Handler(asynchat.async_chat):
         self._buffer.append(data)
 
     def found_terminator(self):
-        msg = json.loads(''.join(self._buffer))
+        msg = self.decode(''.join(self._buffer))
         self._buffer = []
         self.on_msg(msg)
     
@@ -80,10 +35,18 @@ class Handler(asynchat.async_chat):
         
     # API you can use
     def do_send(self, msg):
-        self.push(json.dumps(msg) + '\0')
+        self.push(self.encode(msg) + '\0')
         
     def do_close(self):
         self.handle_close()  # will call self.on_close
+    
+    def encode(self, msg):
+        # return base64.b64encode(zlib.compress(msg))
+        return json.dumps(msg)
+    
+    def decode(self, msg):
+        # return base64.b64decode(zlib.decompress(msg))
+        return json.loads(msg)
     
     # callbacks you should override
     def on_open(self):
