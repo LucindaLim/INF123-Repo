@@ -122,11 +122,11 @@ class PygameView():
 
 model = NetworkModel('localhost', 8888)
 c = NetworkController(model)
-# v = ConsoleView(model)
+v = ConsoleView(model)
 v2 = PygameView(model)
 while 1:
     sleep(0.02)
     model.update()
     c.move()
-#     v.display()
+    v.display()
     v2.display()
